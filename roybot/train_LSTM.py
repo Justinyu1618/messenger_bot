@@ -101,9 +101,9 @@ y = decoder_input_data
 
 model = Sequential()
 model.add(LSTM(HIDDEN_LAYER_SIZE, input_shape=(X.shape[1], X.shape[2]), return_sequences=True))
-model.add(LSTM(HIDDEN_LAYER_SIZE, return_sequences=True))
+model.add(LSTM(HIDDEN_LAYER_SIZE))
 model.add(Dropout(0.5))
-model.add(TimeDistributed(Dense(HIDDEN_LAYER_SIZE)))
+#model.add(TimeDistributed(Dense(64)))
 model.add(Dense(y.shape[1], activation='softmax'))
 
 # load the network weights
@@ -147,7 +147,6 @@ while(True):
     print("Roy: " + decode_sequence(user_input))
 
 """
-
 # pick a random seed
 start = numpy.random.randint(0, len(dataX)-1)
 pattern = dataX[start]

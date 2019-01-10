@@ -5,7 +5,7 @@ from keras import optimizers
 import numpy as np
 import time, os, re
 
-MAX_SEQ_LEN = 40
+MAX_SEQ_LEN = 20
 
 html_file_path = './roy_messages_2017-2018.html'
 justin_color = '#0084ff'
