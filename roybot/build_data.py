@@ -5,7 +5,7 @@ from keras import optimizers
 import numpy as np
 import time, os, re
 
-MAX_SEQ_LEN = 20
+MAX_SEQ_LEN = 5
 
 html_file_path = './roy_messages_2017-2018.html'
 justin_color = '#0084ff'
@@ -46,7 +46,7 @@ for i in range(len(all_dialogue_list) - 1):
 
     
 
-with open('data2.txt', 'w') as file:
+with open('data3_5char.txt', 'w') as file:
     for i in range(len(roy_chunks)):
         file.write(justin_chunks[i] + '\t' + roy_chunks[i] + '\n')
         

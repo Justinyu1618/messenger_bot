@@ -3,8 +3,15 @@ from keras.layers import Dense, Input, LSTM
 from keras import optimizers
 import numpy as np
 import time, os, re
+import sys
 
-DATA_FILE = './data2.txt'
+    
+if len(sys.argv) == 2:
+    DATA_FILE = sys.argv[1]
+elif len(sys.argv) == 1:
+    DATA_FILE = './data2.txt'
+else:
+    sys.argv[10000] #shortcut way to raise an exception lol
 
 #grab data
 input_texts = []
@@ -124,8 +131,6 @@ def decode_sequence(input_seq):
     output_string = ''
     while not stop_condition:
         output_tokens, state_h, state_c = decoder_model.predict([target_seq] + states_value)
-        print(output_tokens)
-        print(output_tokens.shape)
         output_tokens_index = np.argmax(output_tokens[0,-1,:])
         output_char = target_i_to_char_dict[output_tokens_index]
         #print(output_char)
