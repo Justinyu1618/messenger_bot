@@ -68,7 +68,10 @@ target_characters = set()
 with open(data_path, 'r', encoding='utf-8') as f:
     lines = f.read().split('\n')
 for line in lines[: min(num_samples, len(lines) - 1)]:
-    input_text, target_text = line.split('\t')
+    try:
+        input_text, target_text = line.split('\t')
+    except Exception as e:
+        print(Exception)
     # We use "tab" as the "start sequence" character
     # for the targets, and "\n" as "end sequence" character.
     target_text = '\t' + target_text + '\n'

@@ -23,3 +23,5 @@ Log of Roybot project:
 	- Train lstm.py on 20 char data
 	- Train lstm.py on 20 char big data
 	- Train train_rnn.py on 20 char big data
+
+- lstm.py MIGHT work because of dtype
