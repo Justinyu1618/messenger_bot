@@ -170,7 +170,7 @@ else:
     #model = load_model(load_file)
     print("Loaded: " + load_file)
 
-model = load_model('s2s1.h5')
+#model = load_model('s2s1.h5')
 # Next: inference mode (sampling).
 # Here's the drill:
 # 1) encode input and retrieve initial decoder state

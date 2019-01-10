@@ -13,7 +13,7 @@ target_file = 'data3.txt'
 #make this a lot prettier
 if len(sys.argv) == 4:
     html_file_path = sys.argv[1]
-    MAX_SEQ_LEN = sys.argv[3]
+    MAX_SEQ_LEN = int(sys.argv[3])
     target_file = sys.argv[2]
 elif len(sys.argv) == 3:
     html_file_path = sys.argv[1]
