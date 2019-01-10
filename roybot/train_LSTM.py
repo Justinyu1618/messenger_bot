@@ -3,11 +3,12 @@ import numpy as np
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.layers import Dropout
-from keras.layers import LSTM
+from keras.layers import LSTM, TimeDistributed
 from keras.callbacks import ModelCheckpoint
 from keras.utils import np_utils
 
-DATA_FILE = './data1.txt'
+DATA_FILE = './data2.txt'
+HIDDEN_LAYER_SIZE = 256
 
 #grab data
 input_texts = []
@@ -99,10 +100,10 @@ X = encoder_input_data
 y = decoder_input_data
 
 model = Sequential()
-model.add(LSTM(256, input_shape=(X.shape[1], X.shape[2]), return_sequences=True))
-model.add(Dropout(0.2))
-model.add(LSTM(256))
-model.add(Dropout(0.2))
+model.add(LSTM(HIDDEN_LAYER_SIZE, input_shape=(X.shape[1], X.shape[2]), return_sequences=True))
+model.add(LSTM(HIDDEN_LAYER_SIZE, return_sequences=True))
+model.add(Dropout(0.5))
+model.add(TimeDistributed(Dense(HIDDEN_LAYER_SIZE)))
 model.add(Dense(y.shape[1], activation='softmax'))
 
 # load the network weights
