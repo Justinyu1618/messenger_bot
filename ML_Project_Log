@@ -1,0 +1,25 @@
+Log of Roybot project:
+
+- Ran out of memory
+- Only need bordering messages, not entire message chunks
+- Ran out of memory
+
+- Processed out all non-ascii text
+- Changed numpy dType to Boolean, since all data is one-hot encoded
+
+
+
+- Used build data to generate text files of various character lengths in order to control difficulty of training.
+
+- Found very small improvement with lower character length
+
+- Old fra-eng translation code somehow works tho, look into this
+
+- Next step: use word embeddings
+
+- Also downloaded a shit ton of more dat
+
+- Things to do:
+	- Train lstm.py on 20 char data
+	- Train lstm.py on 20 char big data
+	- Train train_rnn.py on 20 char big data

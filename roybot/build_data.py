@@ -4,10 +4,29 @@ from keras.layers import Dense, Input, LSTM
 from keras import optimizers
 import numpy as np
 import time, os, re
+import sys
 
-MAX_SEQ_LEN = 5
-
+MAX_SEQ_LEN = 10000000
 html_file_path = './roy_messages_2017-2018.html'
+target_file = 'data3.txt'
+
+#make this a lot prettier
+if len(sys.argv) == 4:
+    html_file_path = sys.argv[1]
+    MAX_SEQ_LEN = sys.argv[3]
+    target_file = sys.argv[2]
+elif len(sys.argv) == 3:
+    html_file_path = sys.argv[1]
+    target_file = sys.argv[2]
+elif len(sys.argv) == 2:
+    html_file_path = sys.argv[1]
+elif len(sys.argv) == 1:
+    pass
+else:
+    sys.argv[10000] #shortcut way to raise an exception lol
+
+
+
 justin_color = '#0084ff'
 roy_color = '#f1f0f0'
 
@@ -46,7 +65,7 @@ for i in range(len(all_dialogue_list) - 1):
 
     
 
-with open('data3_5char.txt', 'w') as file:
+with open(target_file, 'w') as file:
     for i in range(len(roy_chunks)):
         file.write(justin_chunks[i] + '\t' + roy_chunks[i] + '\n')
         
