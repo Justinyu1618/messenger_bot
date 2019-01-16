@@ -1,0 +1,6 @@
+name,data,epochs,batch_size,latent_dim,learning_rate0,data/data3_5char.txt,25,64,256,0.001
+1,data/data3_5char.txt,25,32,256,0.001
+2,data/data3_5char.txt,25,16,256,0.001
+3,data/data3_5char.txt,50,16,256,0.001
+4,data/data3_5char.txt,25,64,256,0.001
+5,data/data3_5char.txt,25,32,256,0.001
