@@ -1,0 +1,2 @@
+epochs,batch_size,latent_dim,learning_rate
+20,64,512,0.01

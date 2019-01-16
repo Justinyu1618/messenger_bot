@@ -1,33 +1,4 @@
-'''Sequence to sequence example in Keras (character-level).
-This script demonstrates how to implement a basic character-level
-sequence-to-sequence model. We apply it to translating
-short English sentences into short French sentences,
-character-by-character. Note that it is fairly unusual to
-do character-level machine translation, as word-level
-models are more common in this domain.
-# Summary of the algorithm
-- We start with input sequences from a domain (e.g. English sentences)
-    and corresponding target sequences from another domain
-    (e.g. French sentences).
-- An encoder LSTM turns input sequences to 2 state vectors
-    (we keep the last LSTM state and discard the outputs).
-- A decoder LSTM is trained to turn the target sequences into
-    the same sequence but offset by one timestep in the future,
-    a training process called "teacher forcing" in this context.
-    Is uses as initial state the state vectors from the encoder.
-    Effectively, the decoder learns to generate `targets[t+1...]`
-    given `targets[...t]`, conditioned on the input sequence.
-- In inference mode, when we want to decode unknown input sequences, we:
-    - Encode the input sequence into state vectors
-    - Start with a target sequence of size 1
-        (just the start-of-sequence character)
-    - Feed the state vectors and 1-char target sequence
-        to the decoder to produce predictions for the next character
-    - Sample the next character using these predictions
-        (we simply use argmax).
-    - Append the sampled character to the target sequence
-    - Repeat until we generate the end-of-sequence character or we
-        hit the character limit.
+'''
 # Data download
 English to French sentence pairs.
 http://www.manythings.org/anki/fra-eng.zip
@@ -46,11 +17,12 @@ from keras.models import Model, load_model
 from keras.layers import Input, LSTM, Dense
 import numpy as np
 import sys
+import time
 
 batch_size = 64  # Batch size for training.
-epochs = 100  # Number of epochs to train for.
-latent_dim = 256  # Latent dimensionality of the encoding space.
-num_samples = 10000  # Number of samples to train on.
+epochs = 25  # Number of epochs to train for.
+latent_dim = 512  # Latent dimensionality of the encoding space.
+num_samples = 15000  # Number of samples to train on.
 # Path to the data txt file on disk.
 
 if len(sys.argv) == 2:
@@ -116,11 +88,8 @@ for i, (input_text, target_text) in enumerate(zip(input_texts, target_texts)):
     for t, char in enumerate(input_text):
         encoder_input_data[i, t, input_token_index[char]] = 1.
     for t, char in enumerate(target_text):
-        # decoder_target_data is ahead of decoder_input_data by one timestep
         decoder_input_data[i, t, target_token_index[char]] = 1.
         if t > 0:
-            # decoder_target_data will be ahead by one timestep
-            # and will not include the start character.
             decoder_target_data[i, t - 1, target_token_index[char]] = 1.
 
 # Define an input sequence and process it.
@@ -128,21 +97,15 @@ encoder_inputs = Input(shape=(None, num_encoder_tokens))
 print("Before trainng: " + str(np.sum(encoder_inputs)))
 encoder = LSTM(latent_dim, return_state=True)
 encoder_outputs, state_h, state_c = encoder(encoder_inputs)
-# We discard `encoder_outputs` and only keep the states.
 encoder_states = [state_h, state_c]
 
 # Set up the decoder, using `encoder_states` as initial state.
 decoder_inputs = Input(shape=(None, num_decoder_tokens))
-# We set up our decoder to return full output sequences,
-# and to return internal states as well. We don't use the
-# return states in the training model, but we will use them in inference.
 decoder_lstm = LSTM(latent_dim, return_sequences=True, return_state=True)
 decoder_outputs, _, _ = decoder_lstm(decoder_inputs,
                                      initial_state=encoder_states)
-#print("---Initial decoder outputs---\nShape: {0}\nType:{1}\nFull:{2}".format(decoder_outputs.shape, type(decoder_outputs), decoder_outputs))
 decoder_dense = Dense(num_decoder_tokens, activation='softmax')
 decoder_outputs = decoder_dense(decoder_outputs)
-#print("---Post-Softmax decoder outputs---\nShape: {0}\nType:{1}\nFull:{2}".format(decoder_outputs.shape, type(decoder_outputs), decoder_outputs))
 
 if __name__ == '__main__':
     try:
@@ -156,17 +119,21 @@ if __name__ == '__main__':
                   batch_size=batch_size,
                   epochs=epochs,
                   validation_split=0.2)
-        # Save model
-        model.save('s2s2.h5')
+        # Save modl
     except KeyboardInterrupt:
-        model.save('s2s2.h5')
+        pass
+
+    if len(sys.argv) == 2:
+        model.save('seq2seq_fa_weights/'+str(time.ctime()).replace(' ','_') + '_' + '_' + str(latent_dim) +  '_TRAINING_MODEL.h5')
+    else:
+        model.save('seq2seq_fa_weights/'+str(time.ctime()).replace(' ','_') + '_' + str(latent_dim)  + '_TRAINING_MODEL.h5')
     
     
 else:
     #from keras.backend import manual_variable_initialization
     #manual_variable_initialization(True)
     
-    load_file = 's2s1.h5'
+    load_file = 'seq2seq_weights/Sat_Jan_12_16:40:58_2019TRAINING_MODEL.h5'
     #model = load_model(load_file)
     print("Loaded: " + load_file)
 
@@ -194,14 +161,13 @@ if __name__ == '__main__':
     decoder_model = Model(
         [decoder_inputs] + decoder_states_inputs,
         [decoder_outputs] + decoder_states)
-    encoder_model.save('s2s2_enc.h5')
-    
-    decoder_model.save('s2s2_dec.h5')
+    decoder_model.save('seq2seq_fa_weights/'+str(time.ctime()).replace(' ','_') + '_DECODER_MODEL.h5')
+    encoder_model.save('seq2seq_fa_weights/'+str(time.ctime()).replace(' ','_') + 'ENCODER_MODEL.h5')
 
 else:
-    encoder_model = load_model('s2s2_enc.h5')
+    encoder_model = load_model('seq2seq_weights/Sat_Jan_12_16:40:58_2019_ENCODER_MODEL.h5')
     print("loaded encoder")
-    decoder_model = load_model('s2s2_dec.h5')
+    decoder_model = load_model('seq2seq_weights/Sat_Jan_12_16:40:59_2019_DECODER_MODEL.h5')
     print("loaded decoder")
     
 # Reverse-lookup token index to decode sequences back to
@@ -210,6 +176,7 @@ reverse_input_char_index = dict(
     (i, char) for char, i in input_token_index.items())
 reverse_target_char_index = dict(
     (i, char) for char, i in target_token_index.items())
+
 
 
 def decode_sequence(input_seq):
@@ -251,7 +218,7 @@ def decode_sequence(input_seq):
     return decoded_sentence
 
 
-for seq_index in range(100):
+for seq_index in range(20):
     # Take one sequence (part of the training set)
     # for trying out decoding.
     input_seq = encoder_input_data[seq_index: seq_index + 1]
@@ -267,5 +234,15 @@ def decode(input_str):
     for i, char in enumerate(input_str):
         input_seq[0, i, input_token_index[char]] = 1
     return decode_sequence(input_seq)
-                         
+
+
         
+while(True):
+    user_input = input("Justin: ").lower()
+    print("Roy: " + decode(user_input))
+    """
+    user_input_vector = np.zeros((1, max_encoder_seq_length, num_encoder_tokens), dtype='float32')
+    for i, char in enumerate(user_input):
+        user_input_vector[0,i,input_token_index[char]] = 1
+    print("Roy: " + decode(user_input_vector))
+    """
